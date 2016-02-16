@@ -383,6 +383,16 @@ span.version {
 	margin-bottom: 1em;
 }
 
+#apps-list.has-controls {
+	padding-top: 25px;
+}
+
+#controls .update-filter {
+	position: relative;
+	top: 12px;
+	left: 12px;
+}
+
 
 /* LOG */
 #log {

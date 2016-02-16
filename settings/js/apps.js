@@ -78,6 +78,8 @@ OC.Settings.Apps = OC.Settings.Apps || {
 			.removeClass('hidden')
 			.html('');
 		$('#apps-list-empty').addClass('hidden');
+		$('#controls').addClass('hidden');
+
 		$('#app-category-' + OC.Settings.Apps.State.currentCategory).removeClass('active');
 		$('#app-category-' + categoryId).addClass('active');
 		OC.Settings.Apps.State.currentCategory = categoryId;
@@ -124,6 +126,7 @@ OC.Settings.Apps = OC.Settings.Apps || {
 				$('.app-level .experimental').tipsy({fallback: t('settings', 'This app is not checked for security issues and is new or known to be unstable. Install at your own risk.')});
 			},
 			complete: function() {
+				var availableUpdates = 0;
 				$('#apps-list').removeClass('icon-loading');
 				$.ajax(OC.generateUrl('settings/apps/list?category={categoryId}&includeUpdateInfo=1', {
 					categoryId: categoryId
@@ -135,8 +138,17 @@ OC.Settings.Apps = OC.Settings.Apps || {
 								var $update = $('#app-' + app.id + ' .update');
 								$update.removeClass('hidden');
 								$update.val(t('settings', 'Update to %s').replace(/%s/g, app.update));
+								availableUpdates++;
+								OC.Settings.Apps.State.apps[app.id].update = true;
 							}
-						})
+						});
+
+						if (availableUpdates > 0) {
+							$('#controls').removeClass('hidden');
+							$('#filter_update_apps').attr('checked', false);
+							$('#apps-list').addClass('has-controls');
+							OC.Notification.showTemporary(n('settings', 'You have %n app update pending', 'You have %n app updates pending', availableUpdates));
+						}
 					}
 				});
 			}
@@ -409,12 +421,21 @@ OC.Settings.Apps = OC.Settings.Apps || {
 		);
 	},
 
-	filter: function(query) {
+	filter: function(query, filterUpdate) {
 		var $appList = $('#apps-list'),
 			$emptyList = $('#apps-list-empty');
 		$appList.removeClass('hidden');
 		$appList.find('.section').removeClass('hidden');
 		$emptyList.addClass('hidden');
+
+		if (filterUpdate) {
+			_.each(OC.Settings.Apps.State.apps, function (app) {
+				if (!app.update) {
+					$('#app-' + app.id).addClass('hidden');
+				}
+			});
+			return;
+		}
 
 		if (query === '') {
 			return;
@@ -573,6 +594,11 @@ OC.Settings.Apps = OC.Settings.Apps || {
 					location.reload();
 				}
 			});
+		});
+
+		$(document).on('click', '#filter_update_apps', function () {
+			var state = $(this).prop('checked');
+			OC.Settings.Apps.filter('', state);
 		});
 	}
 };

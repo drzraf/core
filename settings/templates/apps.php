@@ -97,6 +97,10 @@ script(
 	<div class="app-description-toggle-show"><?php p($l->t("Show description …"));?></div>
 	<div class="app-description-toggle-hide hidden"><?php p($l->t("Hide description …"));?></div>
 
+	<div class="app-dependencies update hidden">
+		<p><?php p($l->t('This app has an update available.')); ?></p>
+	</div>
+
 	{{#if missingMinOwnCloudVersion}}
 		<div class="app-dependencies">
 			<p><?php p($l->t('This app has no minimum ownCloud version assigned. This will be an error in ownCloud 11 and later.')); ?></p>
@@ -162,6 +166,13 @@ script(
 	</div>
 </div>
 <div id="app-content">
+	<div id="controls" class="hidden">
+		<div class="update-filter">
+			<input id="filter_update_apps" name="filter_update_apps" type="checkbox" class="checkbox" />
+			<label for="filter_update_apps"><?php p($l->t('Only show apps with available updates')); ?></label>
+		</div>
+	</div>
+
 	<div id="apps-list" class="icon-loading"></div>
 	<div id="apps-list-empty" class="hidden emptycontent">
 		<div class="icon-search"></div>
