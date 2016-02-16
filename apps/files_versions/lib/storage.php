@@ -42,6 +42,7 @@
 namespace OCA\Files_Versions;
 
 use OC\Files\Filesystem;
+use OC\User\NoUserException;
 use OCA\Files_Versions\AppInfo\Application;
 use OCA\Files_Versions\Command\Expire;
 use OCP\Lock\ILockingProvider;
@@ -80,12 +81,23 @@ class Storage {
 	private static $application;
 
 	/**
+	 * get the UID of the owner of the file and the path to the file relative to
+	 * owners files folder
 	 * @param string $filename
 	 * @return array
 	 * @throws \OC\User\NoUserException
 	 */
 	public static function getUidAndFilename($filename) {
-		return Filesystem::getView()->getUidAndFilename($filename);
+		try {
+			list($uid, $filename) = Filesystem::getView()->getUidAndFilename($filename);
+		} catch (NoUserException $e) {
+			// if the user with the UID doesn't exists, e.g. because the UID points
+			// to a remote user with a federated cloud ID we use the current logged-in
+			// user. We need a valid local user to create the versions in the correct location
+			$uid = \OCP\User::getUser();
+		}
+
+		return [$uid, $filename];
 	}
 
 	/**

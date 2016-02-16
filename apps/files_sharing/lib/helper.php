@@ -29,6 +29,7 @@
 namespace OCA\Files_Sharing;
 
 use OC\Files\Filesystem;
+use OC\User\NoUserException;
 use OCP\Files\NotFoundException;
 
 class Helper {
