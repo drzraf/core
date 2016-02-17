@@ -375,7 +375,6 @@ class Filesystem {
 		if (isset(self::$usersSetup[$user])) {
 			return;
 		}
-		self::$usersSetup[$user] = true;
 
 		$root = \OC_User::getHome($user);
 
@@ -433,6 +432,8 @@ class Filesystem {
 
 		self::listenForNewMountProviders($mountConfigManager, $userManager);
 		\OC_Hook::emit('OC_Filesystem', 'post_initMountPoints', array('user' => $user, 'user_dir' => $root));
+
+		self::$usersSetup[$user] = true;
 	}
 
 	/**
